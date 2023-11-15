@@ -134,6 +134,67 @@ class RecomendacionPeliculas:
         f.close()
         print(i)
 
+    # Cargar Movie-lens 10M
+    def cargarMovieLens10M(self, path=""):
+        """loads the Movie Lens dataset. Path is where the u files are
+        located"""
+        self.data = {}
+        self.userTags = {}
+        i = 0
+        #
+        # First load movie ratings into self.data
+        #
+        f = codecs.open(path + "ratings.dat", "r", "utf-8")
+        for line in f:
+            i += 1
+            # separate line into fields
+            fields = line.split("::")
+            user = fields[0].strip('"')
+            movie = fields[1].strip('"')
+            rating = float(fields[2].strip().strip('"'))
+            if user in self.data:
+                currentRatings = self.data[user]
+            else:
+                currentRatings = {}
+            currentRatings[movie] = rating
+            self.data[user] = currentRatings
+            self.userid2name[user] = user
+        f.close()
+        #
+        # Now load movies into self.productid2name
+        # Movies contains isbn, title, and author among other fields
+        #
+        f = codecs.open(path + "movies.dat", "r", "utf-8")
+        for line in f:
+            i += 1
+            # separate line into fields
+            fields = line.split("::")
+            m_id = fields[0].strip('"')
+            title = fields[1].strip('"')
+            # author = fields[2].strip().strip('"')
+            title = title  # + ' by ' + author
+            self.productid2name[m_id] = title
+        f.close()
+        #
+        # Load users movie's tags into userTags
+        #
+        f = codecs.open(path + "tags.dat", "r", "utf-8")
+        for line in f:
+            i += 1
+            # separate line into fields
+            fields = line.split("::")
+            user = fields[0].strip('"')
+            movie = fields[1].strip('"')
+            tag = str(fields[2].strip().strip('"'))
+            if user in self.userTags:
+                movieTags = self.userTags[user]
+            else:
+                movieTags = {}
+            movieTags[movie] = tag
+            self.userTags[user] = movieTags
+        f.close()
+        print(i)
+
     # Promedio puntaje de peliculas
     def calcular_promedio_peliculas(self):
         puntajes_promedio = {}
