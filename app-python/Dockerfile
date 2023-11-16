@@ -9,6 +9,7 @@ RUN        pip install -r requirements.txt
 
 COPY *.py /app/
 COPY Movie_Ratings.csv /app/
+COPY ./ml-10M100K /app/ml-10M100K/
 RUN chmod a+x *.py
 
 CMD ["python", "./main.py"]

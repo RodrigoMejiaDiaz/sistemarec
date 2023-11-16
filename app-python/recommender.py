@@ -280,6 +280,13 @@ class RecomendacionPeliculas:
         # n_vecinos = [(usuario, distancia) for usuario, distancia in vecinos]
         # return n_vecinos
 
+        if distancia == "manhattan":
+            distancia = self.manhattan
+        if distancia == "pearson":
+            distancia = self.pearson
+        if distancia == "coseno":
+            distancia = self.coseno
+
         """creates a sorted list of users based on their distance to
         username"""
         distances = []
