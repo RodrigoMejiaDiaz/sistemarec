@@ -9,6 +9,14 @@ RUN        pip install -r requirements.txt
 
 COPY *.py /app/
 COPY Movie_Ratings.csv /app/
+
+# Descargar archivo ZIP
+RUN wget -O ml-10m.zip https://files.grouplens.org/datasets/movielens/ml-10m.zip
+
+# Descomprimir archivo ZIP
+RUN apt-get update && apt-get install -y unzip
+RUN unzip ml-10m.zip -d /app/
+
 RUN chmod a+x *.py
 
 CMD ["python", "./main.py"]
