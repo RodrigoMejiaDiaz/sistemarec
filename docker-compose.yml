@@ -15,3 +15,12 @@ services:
       - "5000:5000"
     environment:
       - REDIS_URL=redis://redis:6379
+
+  web:
+    image: php:7-apache
+    ports:
+      - "80:80"
+    environment:
+      - API_ENDPOINT=http://app-python:5000/api/
+    volumes:
+      - ./www:/var/www/html
