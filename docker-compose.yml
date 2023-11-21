@@ -9,8 +9,6 @@ services:
       context: ./app-python
     depends_on:
       - redis
-    volumes:
-      - ./data:/app/data
     ports:
       - "5000:5000"
     environment:
@@ -24,3 +22,20 @@ services:
       - API_ENDPOINT=http://app-python:5000/api/
     volumes:
       - ./www:/var/www/html
+
+  app-dotnet:
+    build:
+      context: ./app-dotnet
+    depends_on:
+      - redis
+
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "postgres"
+    volumes:
+      - "db-data:/var/lib/postgresql/data"
+
+volumes:
+  db-data:

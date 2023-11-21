@@ -3,9 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.002.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "app-dotnet", "app-dotnet", "{BC44A68C-1C60-45B5-9EF3-35B0AB91A2C6}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "workerDotNet", "app-dotnet\workerDotNet\workerDotNet.csproj", "{A1055EDE-EBE3-47DB-8765-F7D958AC9E13}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Worker", "app-dotnet\Worker.csproj", "{71CB7A38-27A6-43E8-A5A0-50C3B8EFDBD5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,18 +11,15 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{A1055EDE-EBE3-47DB-8765-F7D958AC9E13}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A1055EDE-EBE3-47DB-8765-F7D958AC9E13}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A1055EDE-EBE3-47DB-8765-F7D958AC9E13}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A1055EDE-EBE3-47DB-8765-F7D958AC9E13}.Release|Any CPU.Build.0 = Release|Any CPU
+		{71CB7A38-27A6-43E8-A5A0-50C3B8EFDBD5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{71CB7A38-27A6-43E8-A5A0-50C3B8EFDBD5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{71CB7A38-27A6-43E8-A5A0-50C3B8EFDBD5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{71CB7A38-27A6-43E8-A5A0-50C3B8EFDBD5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{A1055EDE-EBE3-47DB-8765-F7D958AC9E13} = {BC44A68C-1C60-45B5-9EF3-35B0AB91A2C6}
-	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {B64B4AB7-AB3B-4C2C-86DF-B527F1111588}
+		SolutionGuid = {A375AEB4-27B5-4547-AB06-1C10AC80B25A}
 	EndGlobalSection
 EndGlobal
