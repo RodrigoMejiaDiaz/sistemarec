@@ -31,6 +31,9 @@ namespace Worker
                 var keepAliveCommand = pgsql.CreateCommand();
                 keepAliveCommand.CommandText = "SELECT 1";
 
+                // Popular base de datos con 10M
+
+                /* 
                 var definition = new { rating = "", user_id = "", movie = "" };
                 while (true)
                 {
@@ -84,6 +87,8 @@ namespace Worker
                         keepAliveCommand.ExecuteNonQuery();
                     }
                 }
+                */
+                
             }
             catch (Exception ex)
             {
