@@ -3,6 +3,8 @@ version: "3"
 services:
   redis:
     image: redis
+    networks:
+      - back-tier
 
   app-python:
     build:
@@ -13,6 +15,8 @@ services:
       - "5000:5000"
     environment:
       - REDIS_URL=redis://redis:6379
+    networks:
+      - back-tier
 
   web:
     image: php:7-apache
@@ -22,12 +26,19 @@ services:
       - API_ENDPOINT=http://app-python:5000/api/
     volumes:
       - ./www:/var/www/html
+    networks:
+      - back-tier
+      - front-tier
 
   app-dotnet:
     build:
       context: ./app-dotnet
     depends_on:
       - redis
+    environment:
+      - REDIS_URL=redis:6379
+    networks:
+      - back-tier
 
   db:
     image: postgres:15-alpine
@@ -36,6 +47,12 @@ services:
       POSTGRES_PASSWORD: "postgres"
     volumes:
       - "db-data:/var/lib/postgresql/data"
+    networks:
+      - back-tier
 
 volumes:
   db-data:
+
+networks:
+  front-tier:
+  back-tier:

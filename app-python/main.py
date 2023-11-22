@@ -26,13 +26,13 @@ def cargar_datos():
     try:
         archivo = "./ml-10M100K/"
         # Recolectar datos si existen ya en Redis
-        jsondatos = redis_conn.get("data")
+        jsondatos = redis_conn.get("ratings")
         if not jsondatos:
             # Procesar el archivo CSV
             datos = procesar_10M(archivo)
             jsondatos = json.dumps(datos)
             # Guardar datos en Redis
-            redis_conn.set("data", jsondatos)
+            redis_conn.set("ratings", jsondatos)
         response = app.response_class(
             status=200, mimetype="application/json", response="Datos cargados"
         )
