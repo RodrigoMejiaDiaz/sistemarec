@@ -608,4 +608,5 @@ pyrightconfig.json
 # End of https://www.toptal.com/developers/gitignore/api/dotnetcore,node,python,visualstudiocode,aspnetcore
 
 app-python/ml-10M100K/
-sistemarec.sln
+*.sln
+backup.sql

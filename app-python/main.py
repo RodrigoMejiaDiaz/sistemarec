@@ -101,4 +101,4 @@ def procesar_recommend(usuario, distancia, n_kk, n_items):
     return data
 
 
-app.run(host="0.0.0.0", port=5000, debug=True)
+app.run(host="0.0.0.0", port=5010, debug=True)

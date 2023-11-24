@@ -27,7 +27,7 @@
     </form>
 
     <?php
-    $api_endpoint = $_ENV["API_ENDPOINT"] ?: "http://localhost:5000/api/";
+    $api_endpoint = $_ENV["API_ENDPOINT"] ?: "http://localhost:5010/api/";
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (isset($_POST['cargar_datos'])) {
             $output = exec("curl -i ${api_endpoint}cargar");

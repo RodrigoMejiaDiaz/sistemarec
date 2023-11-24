@@ -33,7 +33,7 @@ namespace Worker
 
                 // Popular base de datos con 10M
 
-                /* 
+                
                 var definition = new { rating = "", user_id = "", movie = "" };
                 while (true)
                 {
@@ -87,7 +87,7 @@ namespace Worker
                         keepAliveCommand.ExecuteNonQuery();
                     }
                 }
-                */
+                
                 
             }
             catch (Exception ex)

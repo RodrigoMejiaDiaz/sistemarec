@@ -7,12 +7,13 @@ services:
       - back-tier
 
   app-python:
+    image: 127.0.0.1:5000/stackrec
     build:
       context: ./app-python
     depends_on:
       - redis
     ports:
-      - "5000:5000"
+      - "5010:5010"
     environment:
       - REDIS_URL=redis://redis:6379
     networks:
@@ -23,7 +24,7 @@ services:
     ports:
       - "80:80"
     environment:
-      - API_ENDPOINT=http://app-python:5000/api/
+      - API_ENDPOINT=http://app-python:5010/api/
     volumes:
       - ./www:/var/www/html
     networks:
@@ -31,6 +32,7 @@ services:
       - front-tier
 
   app-dotnet:
+    image: 127.0.0.1:5000/stackrec
     build:
       context: ./app-dotnet
     depends_on:
