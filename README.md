@@ -10,5 +10,5 @@
 7. Eliminar contenedores `docker-compose down -v`
 
 ## Web
-1. Ingresar www://localhost:80
+1. Ingresar `www://localhost:80`
 
