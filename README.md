@@ -8,3 +8,7 @@
 4. Cargar vecino más cercano usuario 200 usando pearson `curl -i http://localhost:5000/api/knn/200/pearson`
 6. Recomendar peliculas usuario 200 `curl -i http://localhost:5000/api/recommend/200/pearson/1/5`
 7. Eliminar contenedores `docker-compose down -v`
+
+## Web
+1. Ingresar www://localhost:80
+
