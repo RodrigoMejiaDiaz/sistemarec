@@ -104,7 +104,7 @@ namespace Worker
                             string user_id = array.Name;
                             JArray vecinos = (JArray)array.Value;
 
-                            Console.WriteLine($"user_id: {user_id}");
+                            //Console.WriteLine($"user_id: {user_id}");
 
                             foreach (JArray subArray in vecinos.Cast<JArray>())
                             {
@@ -112,7 +112,7 @@ namespace Worker
                                 string vecino = subArray[0].ToString();
                                 JToken distancia = subArray[1];
 
-                                Console.WriteLine($"knn_id: {knn_id}, vecino: {vecino}, Distancia: {distancia}");
+                                //Console.WriteLine($"knn_id: {knn_id}, vecino: {vecino}, Distancia: {distancia}");
 
                                 // Reconnect DB if down
                                 if (!pgsql.State.Equals(System.Data.ConnectionState.Open))
@@ -145,7 +145,7 @@ namespace Worker
                             string user_id = recomendaciones.Name;
                             JArray movies = (JArray)recomendaciones.Value;
 
-                            Console.WriteLine($"user_id: {user_id}");
+                            //Console.WriteLine($"user_id: {user_id}");
 
                             foreach (JArray subArray in movies.Cast<JArray>())
                             {
@@ -153,7 +153,7 @@ namespace Worker
                                 string movie = subArray[0].ToString();
                                 JToken rating = subArray[1];
 
-                                Console.WriteLine($"rec_id: {rec_id}, movie: {movie}, Puntaje: {rating}");
+                                //Console.WriteLine($"rec_id: {rec_id}, movie: {movie}, Puntaje: {rating}");
 
                                 // Reconnect DB if down
                                 if (!pgsql.State.Equals(System.Data.ConnectionState.Open))
