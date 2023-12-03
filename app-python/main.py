@@ -44,12 +44,12 @@ def cargar_datos():
 @app.route("/api/knn/<usuario>/<distancia>")
 def calcular_vecinos(usuario, distancia):
     try:
-        u = "knn" + usuario
-        jsonvecinos = redis_conn.get(u)
+        jsonvecinos = redis_conn.get("knn")
         if not jsonvecinos:
             vecinos = procesar_knn(usuario, distancia)
             jsonvecinos = json.dumps(vecinos)
-            redis_conn.set(u, jsonvecinos)
+            jsonvecinos_redis = {usuario: vecinos}
+            redis_conn.lpush("knn", json.dumps(jsonvecinos_redis))
         response = app.response_class(
             status=200, mimetype="application/json", response=jsonvecinos
         )
@@ -61,12 +61,12 @@ def calcular_vecinos(usuario, distancia):
 @app.route("/api/recommend/<usuario>/<distancia>/<int:n_kk>/<int:n_items>")
 def calcular_recommend(usuario, distancia, n_kk, n_items):
     try:
-        u = "rec" + usuario
-        jsonrecomendaciones = redis_conn.get(u)
+        jsonrecomendaciones = redis_conn.get("rec")
         if not jsonrecomendaciones:
             recomendaciones = procesar_recommend(usuario, distancia, n_kk, n_items)
             jsonrecomendaciones = json.dumps(recomendaciones)
-            redis_conn.set(u, jsonrecomendaciones)
+            jsonrecomendaciones_redis = {usuario: recomendaciones}
+            redis_conn.lpush("rec", json.dumps(jsonrecomendaciones_redis))
         response = app.response_class(
             status=200, mimetype="application/json", response=jsonrecomendaciones
         )

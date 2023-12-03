@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Npgsql;
 using StackExchange.Redis;
 
@@ -20,7 +21,7 @@ namespace Worker
                 // var redisConn = OpenRedisConnection("redis");
                 // var redis = redisConn.GetDatabase();
                 // Establecer la conexión a Redis
-                string redisUrl = Environment.GetEnvironmentVariable("REDIS_URL") ?? "localhost:6379";
+                string redisUrl = Environment.GetEnvironmentVariable("REDIS_URL") ?? "redis://localhost:6379";
                 var redis_conn = ConnectionMultiplexer.Connect(redisUrl);
 
                 // Obtener una instancia del cliente de Redis
@@ -38,7 +39,7 @@ namespace Worker
                 while (true)
                 {
                     // Slow down to prevent CPU spike, only query each 100ms
-                    Thread.Sleep(5000);
+                    Thread.Sleep(100);
 
                     // Reconnect redis if down
                     if (redis_conn == null || !redis_conn.IsConnected) {
@@ -46,8 +47,11 @@ namespace Worker
                         redis_conn = ConnectionMultiplexer.Connect(redisUrl);
                         redis = redis_conn.GetDatabase();
                     }
+
+                    //RATINGS
+
                     // string json = redis.StringGet("ratings");
-                    string json = redis.StringGet("");
+                    /* 
                     if (json != null)
                     {
                         // Deserializar la cadena JSON a un diccionario en C#
@@ -86,9 +90,90 @@ namespace Worker
                     {
                         keepAliveCommand.ExecuteNonQuery();
                     }
+                */
+
+
+                    //KNN
+                    RedisValue jsonknn = redis.ListRightPop("knn");
+                        
+                    if (!jsonknn.IsNullOrEmpty)
+                    {
+                        JObject jsonObject = JObject.Parse(jsonknn.ToString());
+                        foreach (var array in jsonObject.Properties())
+                        {
+                            string user_id = array.Name;
+                            JArray vecinos = (JArray)array.Value;
+
+                            Console.WriteLine($"user_id: {user_id}");
+
+                            foreach (JArray subArray in vecinos.Cast<JArray>())
+                            {
+                                string knn_id = Guid.NewGuid().ToString();
+                                string vecino = subArray[0].ToString();
+                                JToken distancia = subArray[1];
+
+                                Console.WriteLine($"knn_id: {knn_id}, vecino: {vecino}, Distancia: {distancia}");
+
+                                // Reconnect DB if down
+                                if (!pgsql.State.Equals(System.Data.ConnectionState.Open))
+                                {
+                                    Console.WriteLine("Reconnecting DB");
+                                    pgsql = OpenDbConnection("Server=db;Username=postgres;Password=postgres;");
+                                }
+                                else
+                                { 
+                                    UpdateKnn(pgsql, knn_id, user_id, vecino, distancia.Value<double>());
+                                }
+                            }
+                        }
+                        
+                    }
+                    else
+                    {
+                        keepAliveCommand.ExecuteNonQuery();
+                    }
+
+
+                    //Recomendaciones
+                    RedisValue jsonrecs = redis.ListRightPop("rec");
+                        
+                    if (!jsonrecs.IsNullOrEmpty)
+                    {
+                        JObject jsonObject = JObject.Parse(jsonrecs.ToString());
+                        foreach (var recomendaciones in jsonObject.Properties())
+                        {
+                            string user_id = recomendaciones.Name;
+                            JArray movies = (JArray)recomendaciones.Value;
+
+                            Console.WriteLine($"user_id: {user_id}");
+
+                            foreach (JArray subArray in movies.Cast<JArray>())
+                            {
+                                string rec_id = Guid.NewGuid().ToString();
+                                string movie = subArray[0].ToString();
+                                JToken rating = subArray[1];
+
+                                Console.WriteLine($"rec_id: {rec_id}, movie: {movie}, Puntaje: {rating}");
+
+                                // Reconnect DB if down
+                                if (!pgsql.State.Equals(System.Data.ConnectionState.Open))
+                                {
+                                    Console.WriteLine("Reconnecting DB");
+                                    pgsql = OpenDbConnection("Server=db;Username=postgres;Password=postgres;");
+                                }
+                                else
+                                { 
+                                    UpdateRecs(pgsql, rec_id, user_id, movie, rating.Value<double>());
+                                }
+                            }
+                        }
+                        
+                    }
+                    else
+                    {
+                        keepAliveCommand.ExecuteNonQuery();
+                    }
                 }
-                
-                
             }
             catch (Exception ex)
             {
@@ -178,6 +263,68 @@ namespace Worker
             catch (DbException)
             {
                 command.CommandText = "UPDATE ratings SET rating = @rating WHERE rating_id = @rating_id";
+                command.ExecuteNonQuery();
+            }
+            finally
+            {
+                command.Dispose();
+            }
+        }
+
+        private static void UpdateRecs(NpgsqlConnection connection, string rec_id, string user_id, string movie, double rating)
+        {
+            var command = connection.CreateCommand();
+            try
+            {
+                command.CommandText = $@"CREATE TABLE IF NOT EXISTS rec{user_id} (
+                                        rec_id VARCHAR(255) NOT NULL UNIQUE,
+                                        user_id VARCHAR(255) NOT NULL,
+                                        movie VARCHAR(255) NOT NULL,
+                                        rating DOUBLE PRECISION NOT NULL
+                                    )";
+                command.ExecuteNonQuery();
+
+                command.CommandText = $"INSERT INTO rec{user_id} (rec_id, user_id, movie, rating) VALUES (@rec_id, @user_id, @movie, @rating)";
+                command.Parameters.AddWithValue("@rec_id", rec_id);
+                command.Parameters.AddWithValue("@user_id", user_id);
+                command.Parameters.AddWithValue("@movie", movie);
+                command.Parameters.AddWithValue("@rating", rating);
+                command.ExecuteNonQuery();
+            }
+            catch (DbException)
+            {
+                command.CommandText = $"UPDATE rec{user_id} SET rating = @rating WHERE rec_id = @rec_id";
+                command.ExecuteNonQuery();
+            }
+            finally
+            {
+                command.Dispose();
+            }
+        }
+
+        private static void UpdateKnn(NpgsqlConnection connection, string knn_id, string user_id, string vecino, double distancia)
+        {
+            var command = connection.CreateCommand();
+            try
+            {
+                command.CommandText = $@"CREATE TABLE IF NOT EXISTS knn{user_id} (
+                                        knn_id VARCHAR(255) NOT NULL UNIQUE,
+                                        user_id VARCHAR(255) NOT NULL,
+                                        vecino VARCHAR(255) NOT NULL,
+                                        distancia DOUBLE PRECISION NOT NULL
+                                    )";
+                command.ExecuteNonQuery();
+
+                command.CommandText = $"INSERT INTO knn{user_id} (knn_id, user_id, vecino, distancia) VALUES (@knn_id, @user_id, @vecino, @distancia)";
+                command.Parameters.AddWithValue("@knn_id", knn_id);
+                command.Parameters.AddWithValue("@user_id", user_id);
+                command.Parameters.AddWithValue("@vecino", vecino);
+                command.Parameters.AddWithValue("@distancia", distancia);
+                command.ExecuteNonQuery();
+            }
+            catch (DbException)
+            {
+                command.CommandText = $"UPDATE knn{user_id} SET distancia = @distancia WHERE knn_id = @knn_id";
                 command.ExecuteNonQuery();
             }
             finally

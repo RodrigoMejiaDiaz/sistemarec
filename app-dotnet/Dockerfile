@@ -5,8 +5,6 @@ ARG TARGETARCH
 ARG BUILDPLATFORM
 RUN echo "I am running on $BUILDPLATFORM, building for $TARGETPLATFORM"
 
-ENV REDIS_URL="localhost:6379"
-
 WORKDIR /source
 COPY *.csproj .
 RUN dotnet restore -a $TARGETARCH
