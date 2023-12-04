@@ -11,4 +11,18 @@
 
 ## Web
 
-1. Ingresar `www://localhost:8080`
+1. Ingresar http://localhost:8080
+
+## Backup DB
+
+1. Descargar: https://drive.google.com/file/d/1nCymxQZtwq64KTI2wgEL4tvEkWhFP6K3/view?usp=sharing
+
+2. Crear directorio para guardar el backup.sql `docker compose exec -it db mkdir backups`
+
+3. Copiar backup.sql a contenedor `docker compose cp /ruta/del/archivo/backup.sql db:/backups/backup.sql`
+
+4. Ingresar al shell postgres `docker compose exec -it db psql -U postgres -d postgres`
+
+5. Restaurar copia de seguridad `\i /backups/backup.sql`
+
+6. Salir `exit`
