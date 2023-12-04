@@ -36,6 +36,8 @@ namespace Worker
 
                 
                 var definition = new { rating = "", user_id = "", movie = "" };
+                string? jsonpeliculas_old = null;
+                string? jsonpromedios_old = null;
                 while (true)
                 {
                     // Slow down to prevent CPU spike, only query each 100ms
@@ -92,6 +94,84 @@ namespace Worker
                     }
                 */
 
+                    //peliculas
+
+                    string jsonpeliculas = redis.StringGet("peliculas");
+                    
+                    if (jsonpeliculas != null && jsonpeliculas_old != jsonpeliculas)
+                    {
+                        // Deserializar la cadena JSON a un diccionario en C#
+                        Dictionary<string, string> datos = JsonConvert.DeserializeObject<Dictionary<string, string>>(jsonpeliculas);
+
+                        // Iterar sobre el diccionario y procesar los datos
+                        foreach (var pelicula in datos)
+                        {
+                            string pelicula_id = pelicula.Key;
+                            string pelicula_nombre = pelicula.Value;
+
+
+                            // Aquí puedes realizar la inserción en la base de datos PostgreSQL
+                            // Usando el 'usuario', 'pelicula' y 'puntaje'
+                            Console.WriteLine($"Pelicula_id: {pelicula_id}, Película_nombre: {pelicula_nombre}");
+
+                            // Reconnect DB if down
+                            if (!pgsql.State.Equals(System.Data.ConnectionState.Open))
+                            {
+                                Console.WriteLine("Reconnecting DB");
+                                pgsql = OpenDbConnection("Server=db;Username=postgres;Password=postgres;");
+                            }
+                            else
+                            { // Normal +1 vote requested
+                                UpdatePelicula(pgsql, pelicula_id, pelicula_nombre);
+                            }
+                            
+                        }
+                        jsonpeliculas_old = jsonpeliculas;
+                    }
+                    else
+                    {
+                        keepAliveCommand.ExecuteNonQuery();
+                    }
+
+                    //peliculas promedios
+
+                    string jsonpromedios = redis.StringGet("promedios");
+                    
+                    if (jsonpromedios != null && jsonpromedios_old != jsonpromedios)
+                    {
+                        // Deserializar la cadena JSON a un diccionario en C#
+                        Dictionary<string, double> datos = JsonConvert.DeserializeObject<Dictionary<string, double>>(jsonpromedios);
+
+                        // Iterar sobre el diccionario y procesar los datos
+                        foreach (var pelicula in datos)
+                        {
+                            string pelicula_id = pelicula.Key;
+                            double pelicula_promedio = pelicula.Value;
+                            string promedio_id = Guid.NewGuid().ToString();
+
+                            // Aquí puedes realizar la inserción en la base de datos PostgreSQL
+                            // Usando el 'usuario', 'pelicula' y 'puntaje'
+                            Console.WriteLine($"Promedio_id: {promedio_id}, Pelicula_id: {pelicula_id}, Película_nombre: {pelicula_promedio}");
+
+                            // Reconnect DB if down
+                            if (!pgsql.State.Equals(System.Data.ConnectionState.Open))
+                            {
+                                Console.WriteLine("Reconnecting DB");
+                                pgsql = OpenDbConnection("Server=db;Username=postgres;Password=postgres;");
+                            }
+                            else
+                            { // Normal +1 vote requested
+                                UpdatePromedio(pgsql, promedio_id, pelicula_id, pelicula_promedio);
+                            }
+                            
+                        }
+                        jsonpromedios_old = jsonpromedios;
+                    }
+                    else
+                    {
+                        keepAliveCommand.ExecuteNonQuery();
+                    }
+                
 
                     //KNN
                     RedisValue jsonknn = redis.ListRightPop("knn");
@@ -325,6 +405,61 @@ namespace Worker
             catch (DbException)
             {
                 command.CommandText = $"UPDATE knn{user_id} SET distancia = @distancia WHERE knn_id = @knn_id";
+                command.ExecuteNonQuery();
+            }
+            finally
+            {
+                command.Dispose();
+            }
+        }
+        private static void UpdatePelicula(NpgsqlConnection connection, string pelicula_id, string pelicula_nombre)
+        {
+            var command = connection.CreateCommand();
+            try
+            {
+                command.CommandText = @"CREATE TABLE IF NOT EXISTS peliculas (
+                                        pelicula_id VARCHAR(255) NOT NULL UNIQUE,
+                                        pelicula_nombre VARCHAR(255) NOT NULL
+                                    )";
+                command.ExecuteNonQuery();
+
+                command.CommandText = "INSERT INTO peliculas (pelicula_id, pelicula_nombre) VALUES (@pelicula_id, @pelicula_nombre)";
+                command.Parameters.AddWithValue("@pelicula_id", pelicula_id);
+                command.Parameters.AddWithValue("@pelicula_nombre", pelicula_nombre);
+                command.ExecuteNonQuery();
+            }
+            catch (DbException)
+            {
+                command.CommandText = "UPDATE peliculas SET pelicula_nombre = @pelicula_nombre WHERE pelicula_id = @pelicula_id";
+                command.ExecuteNonQuery();
+            }
+            finally
+            {
+                command.Dispose();
+            }
+        }
+
+        private static void UpdatePromedio(NpgsqlConnection connection,string promedio_id, string pelicula_id, double pelicula_promedio)
+        {
+            var command = connection.CreateCommand();
+            try
+            {
+                command.CommandText = @"CREATE TABLE IF NOT EXISTS peliculas_promedio (
+                                        promedio_id VARCHAR(255) NOT NULL UNIQUE,
+                                        pelicula_id VARCHAR(255) NOT NULL,
+                                        pelicula_promedio DOUBLE PRECISION NOT NULL
+                                    )";
+                command.ExecuteNonQuery();
+
+                command.CommandText = "INSERT INTO peliculas_promedio (promedio_id, pelicula_id, pelicula_promedio) VALUES (@promedio_id, @pelicula_id, @pelicula_promedio)";
+                command.Parameters.AddWithValue("@promedio_id", promedio_id);
+                command.Parameters.AddWithValue("@pelicula_id", pelicula_id);
+                command.Parameters.AddWithValue("@pelicula_promedio", pelicula_promedio);
+                command.ExecuteNonQuery();
+            }
+            catch (DbException)
+            {
+                command.CommandText = "UPDATE peliculas_promedio SET pelicula_promedio = @pelicula_promedio WHERE promedio_id = @promedio_id";
                 command.ExecuteNonQuery();
             }
             finally

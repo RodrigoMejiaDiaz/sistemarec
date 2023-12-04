@@ -1,5 +1,6 @@
 import codecs
-import pandas as pd
+
+# import pandas as pd
 import numpy as np
 import math
 
@@ -16,32 +17,6 @@ class RecomendacionPeliculas:
         self.username2id = {}
         self.userid2name = {}
         self.productid2name = {}
-
-    # Cargar datos Movie_Ratings.csv
-    def cargar_datos_desde_csv(self, archivo_csv, encoding="utf-8"):
-        with codecs.open(archivo_csv, "r") as archivo:
-            df = pd.read_csv(archivo, index_col=0)
-
-        df = df.T
-        data = {}
-        datos_peliculas = {}
-
-        for usuario, fila in df.iterrows():
-            datos_usuario = {
-                pelicula: puntaje
-                for pelicula, puntaje in fila.items()
-                if not pd.isna(puntaje)
-            }
-            data[usuario] = datos_usuario
-
-            for pelicula, puntaje in datos_usuario.items():
-                if pelicula in datos_peliculas:
-                    datos_peliculas[pelicula].append(puntaje)
-                else:
-                    datos_peliculas[pelicula] = [puntaje]
-
-        self.data = data
-        self.datos_peliculas = datos_peliculas
 
     def convertProductID2name(self, id):
         """Given product id number return product name"""
@@ -62,6 +37,28 @@ class RecomendacionPeliculas:
         ratings = ratings[:n]
         for rating in ratings:
             print("%s\t%i" % (rating[0], rating[1]))
+
+    # Promedio puntaje de peliculas retorna nombre
+    # def calcular_promedio_peliculas(self):
+    #     puntajes_promedio = {}
+    #     for movie, rating in self.datos_peliculas.items():
+    #         puntaje_promedio = sum(rating) / len(rating)
+    #         puntajes_promedio[movie] = puntaje_promedio
+    #     puntajes_promedio = list(puntajes_promedio.items())
+    #     puntajes_promedio = [(self.convertProductID2name(k), v)
+    #                         for (k, v) in puntajes_promedio]
+    #     # finally sort and return
+    #     puntajes_promedio.sort(key=lambda artistTuple: artistTuple[1],
+    #                  reverse = True)
+    #     return puntajes_promedio
+
+    # Promedio puntaje de peliculas retorna [id_movie: rating]
+    def calcular_promedio_peliculas(self):
+        puntajes_promedio = {}
+        for pelicula, puntajes in self.datos_peliculas.items():
+            puntaje_promedio = sum(puntajes) / len(puntajes)
+            puntajes_promedio[pelicula] = puntaje_promedio
+        return puntajes_promedio
 
     # Cargar conjunto datos Users
     def cargar_conjunto_users(self, users):
@@ -140,6 +137,7 @@ class RecomendacionPeliculas:
         located"""
         self.data = {}
         self.userTags = {}
+        datos_peliculas = {}
         i = 0
         #
         # First load movie ratings into self.data
@@ -156,9 +154,16 @@ class RecomendacionPeliculas:
                 currentRatings = self.data[user]
             else:
                 currentRatings = {}
+
+            if movie in datos_peliculas:
+                datos_peliculas[movie].append(rating)
+            else:
+                datos_peliculas[movie] = [rating]
+
             currentRatings[movie] = rating
             self.data[user] = currentRatings
             self.userid2name[user] = user
+            self.datos_peliculas = datos_peliculas
         f.close()
         #
         # Now load movies into self.productid2name
@@ -194,14 +199,6 @@ class RecomendacionPeliculas:
             self.userTags[user] = movieTags
         f.close()
         print(i)
-
-    # Promedio puntaje de peliculas
-    def calcular_promedio_peliculas(self):
-        puntajes_promedio = {}
-        for pelicula, puntajes in self.datos_peliculas.items():
-            puntaje_promedio = sum(puntajes) / len(puntajes)
-            puntajes_promedio[pelicula] = puntaje_promedio
-        return puntajes_promedio
 
     # Distancia de Manhattan
     def manhattan(self, u1, u2):
