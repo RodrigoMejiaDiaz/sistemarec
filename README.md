@@ -19,7 +19,7 @@
 
 2. Crear directorio para guardar el backup.sql `docker compose exec -it db mkdir backups`
 
-3. Copiar backup.sql a contenedor `docker compose cp /ruta/del/archivo/backup.sql db:/backups/backup.sql`
+3. Copiar backup.sql a contenedor `docker compose cp ./ruta/del/archivo/backup.sql db:/backups/backup.sql`
 
 4. Ingresar al shell postgres `docker compose exec -it db psql -U postgres -d postgres`
 
