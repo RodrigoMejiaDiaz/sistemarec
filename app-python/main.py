@@ -24,12 +24,16 @@ def index():
 @app.route("/api/cargar")
 def cargar_datos():
     try:
-        archivo = "./ml-10M100K/"
+        # archivo10m = "./ml-10M100K/"
+        archivo25m = "./ml-25m/"
         # Recolectar datos si existen ya en Redis
         jsondatos = redis_conn.get("ratings")
         if not jsondatos:
             # Procesar 10M datos
-            datos = procesar_10M(archivo)
+            # datos = procesar_10M(archivo10m)
+
+            # Procesar 25M datos
+            datos = procesar_25M(archivo25m)
             jsondatos = json.dumps(datos)
             # Guardar datos en Redis
             redis_conn.set("ratings", jsondatos)
@@ -106,6 +110,13 @@ def procesar_csv(archivo):
 # Cargar Movie Lens 10M
 def procesar_10M(path):
     r.cargarMovieLens10M(path)
+    data = r.data
+    return data
+
+
+# Cargar Movie lens 25M
+def procesar_25M(path):
+    r.cargarMovieLens25M(path)
     data = r.data
     return data
 

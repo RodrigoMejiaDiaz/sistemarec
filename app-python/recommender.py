@@ -1,4 +1,5 @@
 import codecs
+import csv
 
 # import pandas as pd
 import numpy as np
@@ -198,6 +199,78 @@ class RecomendacionPeliculas:
             movieTags[movie] = tag
             self.userTags[user] = movieTags
         f.close()
+        print(i)
+
+    # Cargar Movie-lens 25M
+    def cargarMovieLens25M(self, path=""):
+        """loads the Movie Lens dataset. Path is where the u files are
+        located"""
+        self.data = {}
+        self.userTags = {}
+        datos_peliculas = {}
+        i = 0
+        #
+        # First load movie ratings into self.data
+        #
+
+        with open(path + "ratings.csv", newline="", encoding="utf-8") as archivo:
+            f = csv.reader(archivo)
+            next(f)
+            for line in f:
+                i += 1
+                # separate line into fields
+                try:
+                    user = line[0]
+                    movie = line[1]
+                    rating = float(line[2])
+                except ValueError as e:
+                    print("Error en linea", line, "error", e)
+
+                if user in self.data:
+                    currentRatings = self.data[user]
+                else:
+                    currentRatings = {}
+
+                if movie in datos_peliculas:
+                    datos_peliculas[movie].append(rating)
+                else:
+                    datos_peliculas[movie] = [rating]
+
+                currentRatings[movie] = rating
+                self.data[user] = currentRatings
+                self.userid2name[user] = user
+                self.datos_peliculas = datos_peliculas
+            #
+            # Now load movies into self.productid2name
+            # Movies contains isbn, title, and author among other fields
+            #
+        with open(path + "movies.csv", newline="", encoding="utf-8") as archivo:
+            f = csv.reader(archivo)
+            next(f)
+            for line in f:
+                i += 1
+                m_id = line[0]
+                title = line[1]
+                # author = fields[2].strip().strip('"')
+                title = title  # + ' by ' + author
+                self.productid2name[m_id] = title
+        #
+        # Load users movie's tags into userTags
+        #
+        with open(path + "tags.csv", newline="", encoding="utf-8") as archivo:
+            f = csv.reader(archivo)
+            next(f)
+            for line in f:
+                i += 1
+                user = line[0]
+                movie = line[1]
+                tag = str(line[2])
+                if user in self.userTags:
+                    movieTags = self.userTags[user]
+                else:
+                    movieTags = {}
+                movieTags[movie] = tag
+                self.userTags[user] = movieTags
         print(i)
 
     # Distancia de Manhattan

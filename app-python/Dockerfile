@@ -11,11 +11,13 @@ COPY *.py /app/
 COPY Movie_Ratings.csv /app/
 
 # Descargar archivo ZIP
-RUN wget -O ml-10m.zip https://files.grouplens.org/datasets/movielens/ml-10m.zip
+# RUN wget -O ml-10m.zip https://files.grouplens.org/datasets/movielens/ml-10m.zip
+RUN wget -O ml-25m.zip https://files.grouplens.org/datasets/movielens/ml-25m.zip
 
 # Descomprimir archivo ZIP
 RUN apt-get update && apt-get install -y unzip
-RUN unzip ml-10m.zip -d /app/
+# RUN unzip ml-10m.zip -d /app/
+RUN unzip ml-25m.zip -d /app/
 
 RUN chmod a+x *.py
 
