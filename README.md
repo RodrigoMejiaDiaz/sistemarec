@@ -7,7 +7,7 @@
 3. Abrir otro terminal, monitor redis `docker-compose exec redis redis-cli monitor`
 4. Cargar vecino más cercano usuario 200 usando pearson `curl -i http://localhost:5010/api/knn/200/pearson`
 5. Recomendar peliculas usuario 200 `curl -i http://localhost:5010/api/recommend/200/pearson/1/5`
-6. Eliminar contenedores `docker-compose down -v`
+6. Eliminar contenedores `docker-compose down`
 
 ## Web
 
