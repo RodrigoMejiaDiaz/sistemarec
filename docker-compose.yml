@@ -7,7 +7,7 @@ services:
       - back-tier
 
   app-python:
-    image: 127.0.0.1:5000/stackrec
+    image: wergfwegsffs/sisrec_py
     build:
       context: ./app-python
     depends_on:
@@ -32,6 +32,7 @@ services:
       - front-tier
 
   app-dotnet:
+    image: wergfwegsffs/sisrec_worker
     build:
       context: ./app-dotnet
     depends_on:
