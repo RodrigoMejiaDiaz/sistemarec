@@ -41,7 +41,7 @@ namespace Worker
                 while (true)
                 {
                     // Slow down to prevent CPU spike, only query each 100ms
-                    Thread.Sleep(100);
+                    Thread.Sleep(500);
 
                     // Reconnect redis if down
                     if (redis_conn == null || !redis_conn.IsConnected) {
@@ -294,6 +294,13 @@ namespace Worker
                                         user_id VARCHAR(255) NOT NULL,
                                         movie VARCHAR(255) NOT NULL,
                                         rating DOUBLE PRECISION NOT NULL
+                                    )";
+            command.ExecuteNonQuery();
+            command.CommandText = @"CREATE TABLE IF NOT EXISTS users (
+                                        user_id SERIAL PRIMARY KEY,
+                                        name VARCHAR(255),
+                                        email VARCHAR(255),
+                                        password VARCHAR(255)
                                     )";
             command.ExecuteNonQuery();
 
