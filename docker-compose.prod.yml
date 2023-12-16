@@ -55,6 +55,8 @@ services:
   frontend:
     build:
       context: ./app-node
+    environment:
+      - HOST=db
     networks:
       - back-tier
       - front-tier
