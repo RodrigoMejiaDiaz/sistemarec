@@ -1,0 +1,17 @@
+FROM node:alpine
+
+RUN mkdir -p /opt/app
+
+WORKDIR /opt/app
+
+COPY package.json package-lock.json ./
+
+RUN npm install -g nodemon
+RUN npm install
+
+COPY *.js .
+
+EXPOSE 3001
+
+# ENTRYPOINT ["nodemon", "/opt/app/index.js"]
+CMD ["npm", "run", "dev"]

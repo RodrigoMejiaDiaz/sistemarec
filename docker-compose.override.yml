@@ -47,12 +47,26 @@ services:
     environment:
       POSTGRES_USER: "postgres"
       POSTGRES_PASSWORD: "postgres"
+    expose:
+      - 5432
     volumes:
       - "db-data:/var/lib/postgresql/data"
     networks:
       - back-tier
-    expose:
-      - 5432
+
+  frontend:
+    build:
+      context: ./app-node
+      dockerfile: Dockerfile.dev
+    command: nodemon index.js
+    volumes:
+      - "./app-node:/opt/app"
+    networks:
+      - back-tier
+    ports:
+      - "3001:3001"
+    depends_on:
+      - db
 
 volumes:
   db-data:
