@@ -1,8 +1,10 @@
 # Sistema de recomendación
 
+En un entorno de desarrollo se tiene que levantar y ejecutar las aplicaciones de NODE y REACT localmente.
+
 ## Comandos
 
-1. Levantar contenedores `docker-compose up -d --build`
+1. Levantar contenedores `docker compose -f docker-compose.yml up -d --build`
 2. Cargar conjunto de datos 10M100K `curl -i http://localhost:5010/api/cargar`
 3. Abrir otro terminal, monitor redis `docker-compose exec redis redis-cli monitor`
 4. Cargar vecino más cercano usuario 200 usando pearson `curl -i http://localhost:5010/api/knn/200/pearson`
@@ -22,3 +24,9 @@
 5. Restaurar copia de seguridad `\i /backups/backup.sql`
 6. Revisar base de datos `\c` luego `\dt`
 7. Salir `exit`
+
+## Modo Producción
+
+Para desplegar la aplicación en un entorno de producción
+
+1. `docker compose -f docker-compose.prod.yml up -d --build`
