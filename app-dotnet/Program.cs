@@ -31,13 +31,11 @@ namespace Worker
                 // https://github.com/npgsql/npgsql/issues/1214#issuecomment-235828359
                 var keepAliveCommand = pgsql.CreateCommand();
                 keepAliveCommand.CommandText = "SELECT 1";
-
-                // Popular base de datos con 10M
-
                 
                 var definition = new { rating = "", user_id = "", movie = "" };
                 string? jsonpeliculas_old = null;
                 string? jsonpromedios_old = null;
+                string? jsonusers_old = null;
                 while (true)
                 {
                     // Slow down to prevent CPU spike, only query each 100ms
@@ -94,26 +92,18 @@ namespace Worker
                     }
                 */
 
-                    //peliculas
+                    //users
 
-                    string jsonpeliculas = redis.StringGet("peliculas");
-                    
-                    if (jsonpeliculas != null && jsonpeliculas_old != jsonpeliculas)
+                    string jsonusers = redis.StringGet("users");
+                     
+                    if (jsonusers != null && jsonusers_old != jsonusers)
                     {
-                        // Deserializar la cadena JSON a un diccionario en C#
-                        Dictionary<string, string> datos = JsonConvert.DeserializeObject<Dictionary<string, string>>(jsonpeliculas);
-
-                        // Iterar sobre el diccionario y procesar los datos
-                        foreach (var pelicula in datos)
+                        JObject jsonObject = JObject.Parse(jsonusers.ToString());
+                        foreach (var array in jsonObject.Properties())
                         {
-                            string pelicula_id = pelicula.Key;
-                            string pelicula_nombre = pelicula.Value;
+                            string user_id = array.Name;
 
-
-                            // Aquí puedes realizar la inserción en la base de datos PostgreSQL
-                            // Usando el 'usuario', 'pelicula' y 'puntaje'
-                            Console.WriteLine($"Pelicula_id: {pelicula_id}, Película_nombre: {pelicula_nombre}");
-
+                            Console.WriteLine($"User_id: {user_id}");
                             // Reconnect DB if down
                             if (!pgsql.State.Equals(System.Data.ConnectionState.Open))
                             {
@@ -121,17 +111,57 @@ namespace Worker
                                 pgsql = OpenDbConnection("Server=db;Username=postgres;Password=postgres;");
                             }
                             else
-                            { // Normal +1 vote requested
-                                UpdatePelicula(pgsql, pelicula_id, pelicula_nombre);
+                            { 
+                                UpdateUsers(pgsql,user_id);
                             }
                             
                         }
-                        jsonpeliculas_old = jsonpeliculas;
+                        jsonusers_old = jsonusers;
                     }
                     else
                     {
                         keepAliveCommand.ExecuteNonQuery();
                     }
+                
+
+                    // //peliculas
+
+                    // string jsonpeliculas = redis.StringGet("peliculas");
+                    
+                    // if (jsonpeliculas != null && jsonpeliculas_old != jsonpeliculas)
+                    // {
+                    //     // Deserializar la cadena JSON a un diccionario en C#
+                    //     Dictionary<string, string> datos = JsonConvert.DeserializeObject<Dictionary<string, string>>(jsonpeliculas);
+
+                    //     // Iterar sobre el diccionario y procesar los datos
+                    //     foreach (var pelicula in datos)
+                    //     {
+                    //         string pelicula_id = pelicula.Key;
+                    //         string pelicula_nombre = pelicula.Value;
+
+
+                    //         // Aquí puedes realizar la inserción en la base de datos PostgreSQL
+                    //         // Usando el 'usuario', 'pelicula' y 'puntaje'
+                    //         Console.WriteLine($"Pelicula_id: {pelicula_id}, Película_nombre: {pelicula_nombre}");
+
+                    //         // Reconnect DB if down
+                    //         if (!pgsql.State.Equals(System.Data.ConnectionState.Open))
+                    //         {
+                    //             Console.WriteLine("Reconnecting DB");
+                    //             pgsql = OpenDbConnection("Server=db;Username=postgres;Password=postgres;");
+                    //         }
+                    //         else
+                    //         { // Normal +1 vote requested
+                    //             UpdatePelicula(pgsql, pelicula_id, pelicula_nombre);
+                    //         }
+                            
+                    //     }
+                    //     jsonpeliculas_old = jsonpeliculas;
+                    // }
+                    // else
+                    // {
+                    //     keepAliveCommand.ExecuteNonQuery();
+                    // }
 
                     //peliculas promedios
 
@@ -350,6 +380,27 @@ namespace Worker
             catch (DbException)
             {
                 command.CommandText = "UPDATE ratings SET rating = @rating WHERE rating_id = @rating_id";
+                command.ExecuteNonQuery();
+            }
+            finally
+            {
+                command.Dispose();
+            }
+        }
+
+        private static void UpdateUsers(NpgsqlConnection connection, string user_id)
+        {
+            var command = connection.CreateCommand();
+            try
+            {
+                command.CommandText = "INSERT INTO users (name) VALUES (@name)";
+                command.Parameters.AddWithValue("@user_id", user_id);
+                command.Parameters.AddWithValue("@name", user_id);
+                command.ExecuteNonQuery();
+            }
+            catch (DbException)
+            {
+                command.CommandText = "UPDATE users SET name = @name WHERE user_id = @user_id";
                 command.ExecuteNonQuery();
             }
             finally

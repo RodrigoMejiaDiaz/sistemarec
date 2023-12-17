@@ -22,7 +22,7 @@ app.get("/users", async (req, res) => {
 });
 
 //GET A USER
-app.get("/users/:id", async (req, res) => {
+app.get("/users/:user_id", async (req, res) => {
   try {
     const { user_id } = req.params;
     const todo = await pool.query("SELECT * FROM users WHERE user_id = $1", [

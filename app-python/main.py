@@ -50,6 +50,22 @@ def cargar_datos():
         return jsonify({"error": f"Error al procesar el archivo: {str(e)}"})
 
 
+@app.route("/api/cargarusers")
+def cargar_users():
+    try:
+        jsonusers = redis_conn.get("users")
+        if not jsonusers:
+            users = procesar_usuarios()
+            jsonusers = json.dumps(users)
+            redis_conn.set("users", jsonusers)
+        response = app.response_class(
+            status=200, mimetype="application/json", response=jsonusers
+        )
+        return response
+    except Exception as e:
+        return jsonify({"error": f"Error al procesar el archivo: {str(e)}"})
+
+
 @app.route("/api/knn/<usuario>/<distancia>")
 def calcular_vecinos(usuario, distancia):
     try:
@@ -142,6 +158,12 @@ def procesar_recommend(usuario, distancia, n_kk, n_items):
 # Calcular promedios peliculas
 def procesar_promedio():
     data = r.calcular_promedio_peliculas()
+    return data
+
+
+# Cargar usuarios guardados
+def procesar_usuarios():
+    data = r.userid2name
     return data
 
 
