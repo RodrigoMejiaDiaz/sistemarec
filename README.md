@@ -14,6 +14,8 @@ En un entorno de desarrollo se tiene que levantar y ejecutar las aplicaciones de
 ## Web
 
 1. Ingresar http://localhost:8080
+2. En el primer cuadro ingresar el ID del usuario
+3. Segundo recuadro ingresar distancia a utilizar "pearson", "manhattan", "coseno"
 
 ## Backup DB
 
