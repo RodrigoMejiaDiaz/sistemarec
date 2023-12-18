@@ -13,7 +13,7 @@ app.use(express.json()); //req.body
 app.get("/users", async (req, res) => {
   try {
     const allUsers = await pool.query(
-      "SELECT * FROM users ORDER BY user_id ASC"
+      "SELECT * FROM users ORDER BY user_id ASC LIMIT 20"
     );
     res.json(allUsers.rows);
   } catch (err) {
