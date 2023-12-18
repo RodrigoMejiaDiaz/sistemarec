@@ -20,7 +20,7 @@ En un entorno de desarrollo se tiene que levantar y ejecutar las aplicaciones de
 
 Se puede usar POSTMAN para hacer los llamados a las siguientes direcciones:
 
-2. Cargar conjunto de datos 10M100K `curl -i http://localhost:5010/api/cargar`
+2. Cargar conjunto de datos 25M `curl -i http://localhost:5010/api/cargar`
 3. Cargar vecino más cercano usuario 200 usando pearson `curl -i http://localhost:5010/api/knn/200/pearson`
 4. Recomendar peliculas usuario 200 `curl -i http://localhost:5010/api/recommend/200/pearson/1/5`
 5. Eliminar contenedores `docker-compose down`
