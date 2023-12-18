@@ -46,3 +46,19 @@ Se puede usar POSTMAN para hacer los llamados a las siguientes direcciones:
 1. Ingresar http://localhost:8080
 2. En el primer cuadro ingresar el ID del usuario
 3. Segundo recuadro ingresar distancia a utilizar "pearson", "manhattan", "coseno"
+
+## Desplegar con Docker Swarm
+
+1. Primer nodo MANAGER `docker swarm init --advertise-addr <ip>`
+
+2. Copiar el comando mostrado a los nodos worker para que se unan al swarm
+
+3. En el primer nodo manager `git clone https://github.com/RodrigoMejiaDiaz/sistemarec.git`
+
+4. `cd sistemarec`
+
+5. `docker stack deploy --compose-file docker-compose.yml stackrec`
+
+6. Esperar a que se replique en los nodos worker
+
+7. Escalar los servicios `docker service scale stackrec_app-python=2 stackrec_app-dotnet=2` 
