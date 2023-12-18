@@ -1,15 +1,29 @@
 # Sistema de recomendación
 
+## Modo Desarrollo
+
 En un entorno de desarrollo se tiene que levantar y ejecutar las aplicaciones de NODE y REACT localmente.
 
-## Comandos
+# SERVIDOR EXPRESS
 
-1. Levantar contenedores `docker compose -f docker-compose.yml up -d --build`
+1. `cd app-node`
+2. `npm install`
+3. `npm run dev`
+
+# APLICACION REACT
+
+1. `cd frontend`
+2. `npm install`
+3. `npm start`
+
+4. Levantar contenedores `docker compose -f docker-compose.yml up -d --build`
+
+Se puede usar POSTMAN para hacer los llamados a las siguientes direcciones:
+
 2. Cargar conjunto de datos 10M100K `curl -i http://localhost:5010/api/cargar`
-3. Abrir otro terminal, monitor redis `docker-compose exec redis redis-cli monitor`
-4. Cargar vecino más cercano usuario 200 usando pearson `curl -i http://localhost:5010/api/knn/200/pearson`
-5. Recomendar peliculas usuario 200 `curl -i http://localhost:5010/api/recommend/200/pearson/1/5`
-6. Eliminar contenedores `docker-compose down`
+3. Cargar vecino más cercano usuario 200 usando pearson `curl -i http://localhost:5010/api/knn/200/pearson`
+4. Recomendar peliculas usuario 200 `curl -i http://localhost:5010/api/recommend/200/pearson/1/5`
+5. Eliminar contenedores `docker-compose down`
 
 ## Web
 
