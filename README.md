@@ -1,5 +1,21 @@
 # Sistema de recomendación
 
+## Modo Producción
+
+Para desplegar la aplicación en un entorno de producción
+
+1. `docker compose -f docker-compose.prod.yml up -d --build`
+
+## Backup DB
+
+1. Descargar: https://drive.google.com/file/d/1nCymxQZtwq64KTI2wgEL4tvEkWhFP6K3/view?usp=sharing
+2. Crear directorio para guardar el backup.sql `docker compose exec -it db mkdir backups`
+3. Copiar backup.sql a contenedor `docker compose cp ./ruta/del/archivo/backup.sql db:/backups/backup.sql`
+4. Ingresar al shell postgres `docker compose exec -it db psql -U postgres -d postgres`
+5. Restaurar copia de seguridad `\i /backups/backup.sql`
+6. Revisar base de datos `\c` luego `\dt`
+7. Salir `exit`
+
 ## Modo Desarrollo
 
 En un entorno de desarrollo se tiene que levantar y ejecutar las aplicaciones de NODE y REACT localmente.
@@ -16,7 +32,7 @@ En un entorno de desarrollo se tiene que levantar y ejecutar las aplicaciones de
 2. `npm install`
 3. `npm start`
 
-4. Levantar contenedores `docker compose -f docker-compose.yml up -d --build`
+1. Levantar contenedores `docker compose -f docker-compose.yml up -d --build`
 
 Se puede usar POSTMAN para hacer los llamados a las siguientes direcciones:
 
@@ -30,19 +46,3 @@ Se puede usar POSTMAN para hacer los llamados a las siguientes direcciones:
 1. Ingresar http://localhost:8080
 2. En el primer cuadro ingresar el ID del usuario
 3. Segundo recuadro ingresar distancia a utilizar "pearson", "manhattan", "coseno"
-
-## Backup DB
-
-1. Descargar: https://drive.google.com/file/d/1nCymxQZtwq64KTI2wgEL4tvEkWhFP6K3/view?usp=sharing
-2. Crear directorio para guardar el backup.sql `docker compose exec -it db mkdir backups`
-3. Copiar backup.sql a contenedor `docker compose cp ./ruta/del/archivo/backup.sql db:/backups/backup.sql`
-4. Ingresar al shell postgres `docker compose exec -it db psql -U postgres -d postgres`
-5. Restaurar copia de seguridad `\i /backups/backup.sql`
-6. Revisar base de datos `\c` luego `\dt`
-7. Salir `exit`
-
-## Modo Producción
-
-Para desplegar la aplicación en un entorno de producción
-
-1. `docker compose -f docker-compose.prod.yml up -d --build`
