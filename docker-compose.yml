@@ -19,17 +19,17 @@ services:
     networks:
       - back-tier
 
-  # web:
-  #   image: php:7-apache
-  #   ports:
-  #     - "8080:80"
-  #   environment:
-  #     - API_ENDPOINT=http://app-python:5010/api/
-  #   volumes:
-  #     - ./www:/var/www/html
-  #   networks:
-  #     - back-tier
-  #     - front-tier
+  web:
+    image: php:7-apache
+    ports:
+      - "8080:80"
+    environment:
+      - API_ENDPOINT=http://app-python:5010/api/
+    volumes:
+      - ./www:/var/www/html
+    networks:
+      - back-tier
+      - front-tier
 
   app-dotnet:
     image: wergfwegsffs/sisrec_worker
